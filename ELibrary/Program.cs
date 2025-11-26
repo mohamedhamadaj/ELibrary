@@ -1,9 +1,5 @@
-
-using ELibrary.Repositories.IRepositories;
-using ELibrary.Services;
 using ELibrary.Configurations;
-using ELibrary.DataAccess;
-using ELibrary.Utilities;
+using ELibrary.Services;
 using ELibrary.Utilities.DBInitializer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -28,9 +24,9 @@ namespace ELibrary
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
-                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                        ?? throw new InvalidOperationException("Connection string"
-                        + "'DefaultConnection' not found.");
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                    ?? throw new InvalidOperationException("Connection string"
+                    + "'DefaultConnection' not found.");
             builder.Services.AddDbContext<ApplicationDBContext>(option =>
             {
                 //option.UseSqlServer(builder.Configuration.GetSection("ConnectionStrings")["DefaultConnection"]);

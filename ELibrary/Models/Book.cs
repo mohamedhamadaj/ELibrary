@@ -17,7 +17,7 @@ namespace ELibrary.Models
         public decimal Discount { get; set; }
         [MaxLength(1000)]
         public string? Description { get; set; }
-        public string Year { get; set; }
+        public string? Year { get; set; }
         public string Image { get; set; } = string.Empty;
         public long Traffic { get; set; }
         public bool IsActive { get; set; }

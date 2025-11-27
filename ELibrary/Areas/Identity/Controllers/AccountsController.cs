@@ -1,5 +1,4 @@
 ﻿using ELibrary.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -125,16 +124,15 @@ namespace ELibrary.Areas.Identity.Controllers
             }
 
             //Generate JWT Token
-            var userRoles = await _userManager.GetRolesAsync(user);
-
-            var claims = new[]
+            var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.UserName!),
-                new Claim(ClaimTypes.Email, user.Email!),
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Role, String.Join(", ", userRoles)),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                 new Claim(ClaimTypes.Name, user.UserName!),
+                 new Claim(ClaimTypes.Email, user.Email!),
+                 new Claim(ClaimTypes.NameIdentifier, user.Id),
+                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
+
+
 
             var accessToken = _tokenService.GenerateAccessToken(claims);
             var refreshToken = _tokenService.GenerateRefreshToken();
@@ -149,6 +147,10 @@ namespace ELibrary.Areas.Identity.Controllers
                 ValidTo = "30 min",
                 RefreshToken = refreshToken,
                 RefreshTokenExpiration = "7 day"
+            });
+            return Ok(new
+            {
+                msg = "success"
             });
         }
 
@@ -240,7 +242,7 @@ namespace ELibrary.Areas.Identity.Controllers
             }
 
             return CreatedAtAction("ValidateOTP", new { userId = validateOTPRequest.ApplicationUserId });
-           
+
         }
 
         [HttpPost("NewPassword")]

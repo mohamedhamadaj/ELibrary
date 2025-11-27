@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace ELibrary.Areas.Customer
         }
 
 
-        [HttpPost("AddToFavorit")]
+        [HttpPost("AddToFavorit/{bookId}")]
         public async Task<IActionResult> AddToFavorit(int bookId)
         {
            var user = await _userManager.GetUserAsync(User);

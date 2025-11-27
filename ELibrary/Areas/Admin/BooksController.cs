@@ -71,7 +71,7 @@ namespace ELibrary.Areas.Admin
         }
 
         [HttpGet("GetOne /{id}")]
-        
+        //[Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> GetOne(int id, CancellationToken cancellationToken)
         {
             var book = await _bookRepository.GetOneAsync(e => e.Id == id, tracked: false, cancellationToken: cancellationToken);
@@ -83,7 +83,7 @@ namespace ELibrary.Areas.Admin
         }
 
         [HttpPost("Create")]
-       
+        //[Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Create(CreateBookRequest createBookRequest, CancellationToken cancellationToken)
         {
             var transaction = _context.Database.BeginTransaction();
@@ -133,7 +133,7 @@ namespace ELibrary.Areas.Admin
         }
 
         [HttpPut("Edit/{id}")]
-        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+        //[Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(int id, UpdateBookRequest updateBookRequest, CancellationToken cancellationToken)
         {
             var bookInDb = await _bookRepository.GetOneAsync(e => e.Id == id, cancellationToken: cancellationToken);
@@ -160,6 +160,7 @@ namespace ELibrary.Areas.Admin
                     bookInDb.Image = fileName;
                 }
             }
+            bookInDb.Year = updateBookRequest.year;
             bookInDb.Title = updateBookRequest.Title;
             bookInDb.Description = updateBookRequest.Description;
             bookInDb.IsActive = updateBookRequest.IsActive;
@@ -167,6 +168,7 @@ namespace ELibrary.Areas.Admin
             bookInDb.Discount = updateBookRequest.Discount;
             bookInDb.Stock = updateBookRequest.Stock;
             bookInDb.CategoryId = updateBookRequest.CategoryId;
+
 
             _bookRepository.Update(bookInDb);
             await _bookRepository.CommitAsync(cancellationToken);
@@ -176,7 +178,7 @@ namespace ELibrary.Areas.Admin
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+        //[Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
 
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {

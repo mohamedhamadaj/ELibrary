@@ -1,22 +1,14 @@
 using ELibrary.Configurations;
 using ELibrary.Services;
-using ELibrary.Utitlies;
-using ELibrary.Utitlies.DBInitilizer;
-using ELibrary.Configurations;
-using ELibrary.DataAccess;
-using ELibrary.Services;
 using ELibrary.Utilities.DBInitializer;
 using ELibrary.Utitlies.DBInitilizer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using Stripe;
-using System.Globalization;
 using System.Text;
 
 namespace ELibrary
@@ -53,7 +45,7 @@ namespace ELibrary
                 .AddEntityFrameworkStores<ApplicationDBContext>()
                 .AddDefaultTokenProviders();
 
-
+            builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
             builder.Services.AddTransient<IEmailSender, EmailSender>();
             builder.Services.AddScoped<IDBInitializer, DBInitializer>();
             builder.Services.AddScoped<IRepository<Category>, Repository<Category>>();
@@ -67,29 +59,38 @@ namespace ELibrary
             builder.Services.RegisterMapsterConfig();
             builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
             StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
-
-            builder.Services.AddAuthentication(option =>
+            builder.Services.AddAuthentication(options =>
             {
-                option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-                .AddJwtBearer(confi =>
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    confi.TokenValidationParameters = new TokenValidationParameters
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = "https://localhost:7058",
+
+                    ValidAudiences = new[]
                     {
-                        ValidateAudience = true,
-                        ValidateIssuer = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = "https://localhost:7058",
-                        ValidAudience = "https://localhost:7058/,https://localhost:42000",
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("4BB86D85AE74ABD1D96DB199A2D894BB86D85AE74ABD1D96DB199A2D89"))
-                    };
-                });
+                         "https://localhost:7058",
+                         "https://localhost:42000"
+                    },
+
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes("4BB86D85AE74ABD1D96DB199A2D894BB86D85AE74ABD1D96DB199A2D89"))
+                };
+            });
+
 
             builder.Services.AddTransient<ITokenService, Services.TokenService>();
 
             builder.Services.AddAuthorization();
+            builder.Services.AddAuthentication();
 
             var app = builder.Build();
 

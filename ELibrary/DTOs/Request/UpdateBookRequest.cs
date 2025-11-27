@@ -7,6 +7,7 @@
         public bool IsActive { get; set; }
         public double Price { get; set; }
         public decimal Discount { get; set; }
+        public string? year { get; set; }
         public int Stock { get; set; }
         public int CategoryId { get; set; }
 

@@ -89,8 +89,8 @@ namespace ELibrary.Areas.Identity.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginRequest loginRequest)
         {
-            var user = await _userManager.FindByNameAsync(loginRequest.UserNameOrEmail) ??
-                await _userManager.FindByEmailAsync(loginRequest.UserNameOrEmail);
+            var user = await _userManager.FindByNameAsync(loginRequest.UserNameOrEmail) ?? await _userManager.FindByEmailAsync(loginRequest.UserNameOrEmail);
+
             if (user is null)
             {
                 return NotFound(new ErrorModelResponse
@@ -129,11 +129,11 @@ namespace ELibrary.Areas.Identity.Controllers
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Email, user.Email!),
                 new Claim(ClaimTypes.Name, user.UserName!),
-                new Claim(ClaimTypes.Role, string.Join(",", userRoles)),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(ClaimTypes.Email, user.Email!),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Role, String.Join(", ", userRoles)),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
             var accessToken = _tokenService.GenerateAccessToken(claims);

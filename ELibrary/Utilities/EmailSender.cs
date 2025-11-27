@@ -9,7 +9,7 @@ namespace ELibrary.Utilities
     {
         public Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            var client = new SmtpClient("sةفp.gmail.com", 587)
+            var client = new SmtpClient("smtp.gmail.com", 587)
             {
                 EnableSsl = true,
                 UseDefaultCredentials= false,

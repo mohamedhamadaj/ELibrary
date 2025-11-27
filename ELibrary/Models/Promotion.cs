@@ -6,7 +6,7 @@ namespace ELibrary.Models
     public class Promotion
     {
         public int Id { get; set; }
-        public int ProductId { get; set; }
+        public int BookId { get; set; }
         [ValidateNever]
         public Book book { get; set; }
         public DateTime PublishAt { get; set; } = DateTime.UtcNow;
@@ -14,6 +14,6 @@ namespace ELibrary.Models
         public bool IsValid { get; set; } = true;
 
         public string Code { get; set; }
-        public decimal Discount { get; set; }
+        public double Discount { get; set; }
     }
 }

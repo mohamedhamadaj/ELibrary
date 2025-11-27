@@ -23,43 +23,32 @@ namespace ELibrary.Areas.Admin
             _logger = logger;
         }
 
-        [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAll(FilterBookRequest filterBookRequest, CancellationToken cancellationToken, [FromQuery] int page = 1)
+        [HttpPost("Get")]
+        public async Task<IActionResult> GetAll(FilterBookRequest  filterBookRequest, CancellationToken cancellationToken, [FromQuery] int page = 1)
         {
+            const decimal discount = 50;
+            var books = await _bookRepository.GetAsync(includes: [e => e.Category], tracked: false, cancellationToken: cancellationToken);
 
-            var books = await _bookRepository.GetAsync(includes: [e => e.Category, e => e.Image], tracked: false, cancellationToken: cancellationToken);
-
-            #region Filter Book
-            FilterBookResponse filterBookResponse = new();
+            #region Filter Product
+            FilterBookResponse filterProductResponse = new();
 
             // Add Filter 
             if (filterBookRequest.title is not null)
             {
-                books = books.Where(e => e.Title.Contains(filterBookRequest.title.Trim()));
-                filterBookResponse.Title = filterBookRequest.title;
-            }
-
-            if (filterBookRequest.publisher is not null)
-            {
-                books = books.Where(e => e.Author == filterBookResponse.Publisher);
-                filterBookResponse.Publisher = filterBookRequest.publisher;
+                books = books.Where(e => e.Title.Contains(filterProductResponse.Title.Trim()));
+                filterProductResponse.Title = filterBookRequest.title;
             }
 
             if (filterBookRequest.categoryId is not null)
             {
                 books = books.Where(e => e.CategoryId == filterBookRequest.categoryId);
-                filterBookResponse.CategoryId = filterBookRequest.categoryId;
+                filterProductResponse.CategoryId = filterBookRequest.categoryId;
             }
 
             if (filterBookRequest.lessQuantity)
             {
                 books = books.OrderBy(e => e.Stock);
-                filterBookResponse.LessQuantity = filterBookRequest.lessQuantity;
-            }
-            if (filterBookRequest.year is not null)
-            {
-                books = books.OrderBy(e => e.Year);
-                filterBookResponse.year = filterBookRequest.year;
+                filterProductResponse.LessQuantity = filterBookRequest.lessQuantity;
             }
 
             #endregion
@@ -75,17 +64,17 @@ namespace ELibrary.Areas.Admin
 
             return Ok(new
             {
-                Books = books.AsEnumerable(),
-                FilterBookResponse = filterBookResponse,
+                Products = books.AsEnumerable(),
+                FilterProductResponse = filterProductResponse,
                 PaginationResponse = paginationResponse
             });
         }
 
         [HttpGet("GetOne /{id}")]
-        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+        
         public async Task<IActionResult> GetOne(int id, CancellationToken cancellationToken)
         {
-            var book = await _bookRepository.GetOneAsync(e => e.Id == id, includes: [e => e.Category, e => e.Image], tracked: false, cancellationToken: cancellationToken);
+            var book = await _bookRepository.GetOneAsync(e => e.Id == id, tracked: false, cancellationToken: cancellationToken);
             if (book is null)
             {
                 return NotFound();
@@ -94,7 +83,7 @@ namespace ELibrary.Areas.Admin
         }
 
         [HttpPost("Create")]
-        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+       
         public async Task<IActionResult> Create(CreateBookRequest createBookRequest, CancellationToken cancellationToken)
         {
             var transaction = _context.Database.BeginTransaction();
@@ -104,21 +93,24 @@ namespace ELibrary.Areas.Admin
             {
                 if (createBookRequest.Img is not null && createBookRequest.Img.Length > 0)
                 {
+                    // Save Img in wwwroot
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(createBookRequest.Img.FileName);
                     var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\book_images", fileName);
 
-                    using (var streem = System.IO.File.Create(filePath))
+                    using (var stream = System.IO.File.Create(filePath))
                     {
-                        await createBookRequest.Img.CopyToAsync(streem);
+                        await createBookRequest.Img.CopyToAsync(stream);
                     }
-                    //save in DB
+
+                    // Save Img in db
                     book.Image = fileName;
                 }
 
                 var addedBook = await _bookRepository.AddAsync(book, cancellationToken);
-                await _bookRepository.CommitAsync();
+                await _bookRepository.CommitAsync(cancellationToken);
 
-                await transaction.CommitAsync(cancellationToken);
+                transaction.Commit();
+
                 return CreatedAtAction(nameof(GetOne), new { id = addedBook.Id }, new
                 {
                     msg = "Add Book Successfully "

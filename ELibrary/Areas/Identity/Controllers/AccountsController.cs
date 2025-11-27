@@ -268,48 +268,48 @@ namespace ELibrary.Areas.Identity.Controllers
             return Ok();
         }
 
-        [HttpPost]
-        [Route("refresh")]
-        public async Task<IActionResult> Refresh(TokenApiRequest tokenApiRequest)
-        {
-            if (tokenApiRequest is null || tokenApiRequest.RefreshToken is null || tokenApiRequest.AccessToken is null)
-                return BadRequest("Invalid client request");
+        //[HttpPost]
+        //[Route("refresh")]
+        //public async Task<IActionResult> Refresh(TokenApiRequest tokenApiRequest)
+        //{
+        //    if (tokenApiRequest is null || tokenApiRequest.RefreshToken is null || tokenApiRequest.AccessToken is null)
+        //        return BadRequest("Invalid client request");
 
-            string accessToken = tokenApiRequest.AccessToken;
-            string refreshToken = tokenApiRequest.RefreshToken;
+        //    string accessToken = tokenApiRequest.AccessToken;
+        //    string refreshToken = tokenApiRequest.RefreshToken;
 
-            var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
+        //    var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
 
-            var userName = principal.Identity.Name;
-            var user = _userManager.Users.FirstOrDefault(e => e.UserName == userName);
+        //    var userName = principal.Identity.Name;
+        //    var user = _userManager.Users.FirstOrDefault(e => e.UserName == userName);
 
-            if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
-                return BadRequest("Invalid client request");
+        //    if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+        //        return BadRequest("Invalid client request");
 
-            var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims);
-            var newRefreshToken = _tokenService.GenerateRefreshToken();
+        //    var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims);
+        //    var newRefreshToken = _tokenService.GenerateRefreshToken();
 
-            user.RefreshToken = newRefreshToken;
-            await _userManager.UpdateAsync(user);
+        //    user.RefreshToken = newRefreshToken;
+        //    await _userManager.UpdateAsync(user);
 
-            return Ok(new
-            {
-                AccessToken = newAccessToken,
-                ValidTo = "30 min",
-                RefreshToken = newRefreshToken,
-            });
-        }
+        //    return Ok(new
+        //    {
+        //        AccessToken = newAccessToken,
+        //        ValidTo = "30 min",
+        //        RefreshToken = newRefreshToken,
+        //    });
+        //}
 
-        [HttpPost, Authorize]
-        [Route("Revoke")]
-        public async Task<IActionResult> Revoke()
-        {
-            var username = User.Identity.Name;
-            var user = _userManager.Users.FirstOrDefault(e => e.UserName == username);
-            if (user == null) return BadRequest();
-            user.RefreshToken = null;
-            await _userManager.UpdateAsync(user);
-            return NoContent();
-        }
+        //[HttpPost, Authorize]
+        //[Route("Revoke")]
+        //public async Task<IActionResult> Revoke()
+        //{
+        //    var username = User.Identity.Name;
+        //    var user = _userManager.Users.FirstOrDefault(e => e.UserName == username);
+        //    if (user == null) return BadRequest();
+        //    user.RefreshToken = null;
+        //    await _userManager.UpdateAsync(user);
+        //    return NoContent();
+        //}
     }
 }

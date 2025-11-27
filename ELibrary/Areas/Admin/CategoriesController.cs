@@ -53,7 +53,7 @@ namespace ELibrary.Areas.Admin
         }
 
         [HttpPost("Create")]
-        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+       
         public async Task<IActionResult> Create(Category category, CancellationToken cancellationToken)
         {
             await _categoryRepository.AddAsync(category, cancellationToken);

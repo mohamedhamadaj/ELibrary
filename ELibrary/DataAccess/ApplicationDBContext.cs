@@ -18,12 +18,14 @@ namespace ELibrary.DataAccess
         public DbSet<Promotion> Promotions { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<ApplicationUserOTP>  ApplicationUserOTPs { get; set; }
+        public DbSet<Favorite> Favorites { get; set; }
 
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(CartEntityTypeConfiguration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(FavoritEntityTypeConfiguration).Assembly);
             base.OnModelCreating(modelBuilder);
         }
     }    

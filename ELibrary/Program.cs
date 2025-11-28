@@ -73,12 +73,12 @@ namespace ELibrary
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
 
-                    ValidIssuer = "https://localhost:7058",
+                    ValidIssuer = "https://localhost:7058/",
 
                     ValidAudiences = new[]
                     {
                          "https://localhost:7058",
-                         "https://localhost:42000"
+                         "https://localhost:4200"
                     },
 
                     IssuerSigningKey = new SymmetricSecurityKey(
@@ -89,8 +89,9 @@ namespace ELibrary
 
             builder.Services.AddTransient<ITokenService, Services.TokenService>();
 
-            builder.Services.AddAuthorization();
-            builder.Services.AddAuthentication();
+            //builder.Services.AddAuthentication();
+            //builder.Services.AddAuthorization();
+
 
             var app = builder.Build();
 
@@ -111,6 +112,7 @@ namespace ELibrary
 
             app.UseAuthentication();
             app.UseAuthorization();
+
             app.MapControllers();
 
             app.Run();

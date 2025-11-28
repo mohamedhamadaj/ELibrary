@@ -26,7 +26,7 @@ namespace ELibrary.Areas.Admin
         [HttpPost("Get")]
         public async Task<IActionResult> GetAll(FilterBookRequest  filterBookRequest, CancellationToken cancellationToken, [FromQuery] int page = 1)
         {
-            const decimal discount = 50;
+            const double discount = 50;
             var books = await _bookRepository.GetAsync(includes: [e => e.Category], tracked: false, cancellationToken: cancellationToken);
 
             #region Filter Product
@@ -35,7 +35,7 @@ namespace ELibrary.Areas.Admin
             // Add Filter 
             if (filterBookRequest.title is not null)
             {
-                books = books.Where(e => e.Title.Contains(filterProductResponse.Title.Trim()));
+                books = books.Where(e => e.Title.Contains(filterProductResponse.Title!.Trim()));
                 filterProductResponse.Title = filterBookRequest.title;
             }
 
@@ -43,6 +43,11 @@ namespace ELibrary.Areas.Admin
             {
                 books = books.Where(e => e.CategoryId == filterBookRequest.categoryId);
                 filterProductResponse.CategoryId = filterBookRequest.categoryId;
+            }
+            if (filterBookRequest.price is not null)
+            {
+                books = books.Where(e => e.Price == filterBookRequest.price);
+                filterProductResponse.Price = filterBookRequest.price;
             }
 
             if (filterBookRequest.lessQuantity)
@@ -71,7 +76,7 @@ namespace ELibrary.Areas.Admin
         }
 
         [HttpGet("GetOne /{id}")]
-        //[Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+        [Authorize]
         public async Task<IActionResult> GetOne(int id, CancellationToken cancellationToken)
         {
             var book = await _bookRepository.GetOneAsync(e => e.Id == id, tracked: false, cancellationToken: cancellationToken);
@@ -83,7 +88,7 @@ namespace ELibrary.Areas.Admin
         }
 
         [HttpPost("Create")]
-        //[Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+        [Authorize]
         public async Task<IActionResult> Create(CreateBookRequest createBookRequest, CancellationToken cancellationToken)
         {
             var transaction = _context.Database.BeginTransaction();
@@ -133,7 +138,7 @@ namespace ELibrary.Areas.Admin
         }
 
         [HttpPut("Edit/{id}")]
-        //[Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(int id, UpdateBookRequest updateBookRequest, CancellationToken cancellationToken)
         {
             var bookInDb = await _bookRepository.GetOneAsync(e => e.Id == id, cancellationToken: cancellationToken);
@@ -178,7 +183,7 @@ namespace ELibrary.Areas.Admin
         }
 
         [HttpDelete("{id}")]
-        //[Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
 
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {

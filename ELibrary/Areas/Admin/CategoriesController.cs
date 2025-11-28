@@ -36,7 +36,7 @@ namespace ELibrary.Areas.Admin
         }
 
         [HttpPut("Edit/{id}")]
-        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, Category category, CancellationToken cancellationToken)
         {
             var categoryInDb = await _categoryRepository.GetOneAsync(e => e.Id == id, cancellationToken: cancellationToken);
@@ -52,8 +52,8 @@ namespace ELibrary.Areas.Admin
             return NoContent();
         }
 
-        [HttpPost("Create")]
-       
+        [HttpPost("Create")]        //[Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+        [Authorize]
         public async Task<IActionResult> Create(Category category, CancellationToken cancellationToken)
         {
             await _categoryRepository.AddAsync(category, cancellationToken);
@@ -66,8 +66,8 @@ namespace ELibrary.Areas.Admin
 
         }
 
-        [HttpDelete("Delete/{id}")]
-        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+        [HttpDelete("Delete/{id}")]        //[Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+        [Authorize]
         public async Task<IActionResult> Delete(int id,CancellationToken cancellationToken)
         {
             var category = await _categoryRepository.GetOneAsync(e => e.Id == id, cancellationToken: cancellationToken);

@@ -15,7 +15,7 @@ namespace ELibrary.Services
 
             var tokeOptions = new JwtSecurityToken(
                 issuer: "https://localhost:7058/",
-                audience: "https://localhost:7058/,https://localhost:4200",
+                audience: "https://localhost:4200",
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(30),
                 signingCredentials: signingCredentials
